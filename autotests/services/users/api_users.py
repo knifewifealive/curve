@@ -11,7 +11,7 @@ class User:
         self.endpoint = UserEndpoints
     
     @allure.step('Post request to setup and clear db')
-    def post_clear_db_users(self) -> Response:
+    def post_setup_db_users(self) -> Response:
         response = requests.post(
             url=self.endpoint.setup_database()
         )
