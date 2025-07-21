@@ -42,7 +42,6 @@ class UserPutSchema(BaseModel):
 class UserValidationError(BaseModel):
     loc: List[Union[int,str]]
     msg: str
-    type: str
 
 class HTTPValidationError(BaseModel):
     detail: List[UserValidationError]
