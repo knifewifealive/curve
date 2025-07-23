@@ -1,6 +1,7 @@
 from faker import Faker
 import random
 
+
 class FakeUser:
     def __init__(self):
         self.fake = Faker()
@@ -14,7 +15,6 @@ class FakeUser:
             "age": self.fake.random_int(min=1, max=99),
             "job": self.fake.job()[:100],
         }
-
 
     # Invalid tests inputs cases
     def invalid_user_empty_fields(self) -> dict:
@@ -65,8 +65,6 @@ class FakeUser:
             "job": self.fake.job()[:100],
         }
 
-
-
     def invalid_user_wrong_age(self) -> dict:
         """Возраст вне диапазона (ge=1, le=99)"""
         return {
@@ -80,25 +78,39 @@ class FakeUser:
     def invalid_user_wrong_types(self) -> dict:
         """Неверные типы данных (например, int вместо str)"""
         return {
-            "nickname": 12345,         # должно быть str
-            "first_name": 5678,        # должно быть str
-            "last_name": None,         # должно быть str
-            "age": "twenty",           # должно быть int
-            "job": 98765               # должно быть str
+            "nickname": 12345,  # должно быть str
+            "first_name": 5678,  # должно быть str
+            "last_name": None,  # должно быть str
+            "age": "twenty",  # должно быть int
+            "job": 98765  # должно быть str
         }
 
+    # PUT
     def put_user_valid(self) -> dict:
         return {
             "age": self.fake.random_int(min=1, max=99),
             "job": self.fake.job()[:100],
         }
 
-    def random_invalid_user(self) -> dict:
-        """Случайный выбор сценария невалидного пользователя"""
-        scenarios = [
-            self.invalid_user_empty_fields,
-            self.invalid_user_too_long,
-            self.invalid_user_wrong_age,
-            self.invalid_user_wrong_types
-        ]
-        return random.choice(scenarios)()
+    def put_user_invalid_type_age_and_job(self) -> dict:
+        return {
+            "age": self.fake.name(),
+            "job": self.fake.random_int(min=1, max=2)
+        }
+
+    def put_user_invalid_type_age(self) -> dict:
+        return {
+            "age": self.fake.name(),
+            "job": self.fake.job()[:100]
+        }
+
+    def put_user_invalid_type_job(self) -> dict:
+        return {
+            "age": self.fake.random_int(min=1, max=99),
+            "job": self.fake.random_int(min=1, max=99)
+        }
+
+    # User_Info
+
+
+

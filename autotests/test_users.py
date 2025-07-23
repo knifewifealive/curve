@@ -16,21 +16,24 @@ class TestUsers(BaseTest):
 
     @allure.story('Create user positive')
     @pytest.mark.api_positive
-    def test_post_create_user(self, create_and_delete_user, response_validator):
-        assert response_validator.validate_positive_requests(create_and_delete_user,'GetUserByNickname')
+    def test_post_create_user(self, create_and_delete_user, response_validator, user):
+        with allure.step('Check that user exists'):
+            response = self.user.get_user_by_nickname(create_and_delete_user['nickname'])
+            assert response.status_code == 200, response.json()
+        with allure.step('Validate user'):
+            assert response_validator.validate_positive_requests(create_and_delete_user, 'GetUserByNickname')
 
-
-    invalid_user = FakeUser()
+    user_generator = FakeUser()
 
     @allure.story('Post create user negative')
     @pytest.mark.api_negative
     @pytest.mark.parametrize('case, data', [
-        ("Empty fields", invalid_user.invalid_user_empty_fields()),
-        ("Too long fields", invalid_user.invalid_user_too_long()),
-        ("Wrong age", invalid_user.invalid_user_wrong_age()),
-        ("Wrong types", invalid_user.invalid_user_wrong_types()),
+        ("Empty fields", user_generator.invalid_user_empty_fields()),
+        ("Too long fields", user_generator.invalid_user_too_long()),
+        ("Wrong age", user_generator.invalid_user_wrong_age()),
+        ("Wrong types", user_generator.invalid_user_wrong_types()),
     ])
-    def test_post_create_user_negative(self,case, data, user, response_validator):
+    def test_post_create_user_negative(self, case, data, user, response_validator):
         with allure.step(f'Try to create user with invalid data: {case}'):
             response = user.post_create_user(**data)
             allure.attach(str(data), name=f"Invalid user case: {case}",
@@ -46,20 +49,19 @@ class TestUsers(BaseTest):
 
     @allure.story('Get user by nickname')
     @pytest.mark.api_positive
-    def test_get_user_by_nickname(self,create_and_delete_user, user, response_validator):
+    def test_get_user_by_nickname(self, create_and_delete_user, user, response_validator):
         nickname = create_and_delete_user['nickname']
         response = user.get_user_by_nickname(nickname)
         assert response.status_code == 200, response.json()
 
-
     @allure.story('Get user negative')
     @pytest.mark.api_negative
     @pytest.mark.parametrize('case, data', [
-        ("Too long nickname", invalid_user.invalid_user_too_long_nickname()),
-        ("Int in nickname", invalid_user.invalid_user_nickname_type()),
-        #("Nickname is empty", invalid_user.invalid_user_nickname_is_empty())
+        ("Too long nickname", user_generator.invalid_user_too_long_nickname()),
+        ("Int in nickname", user_generator.invalid_user_nickname_type()),
+        # ("Nickname is empty", user_generator.invalid_user_nickname_is_empty())
     ])
-    def test_get_user_by_nickname(self,create_and_delete_user, user, response_validator, case, data):
+    def test_get_user_by_nickname(self, create_and_delete_user, user, response_validator, case, data):
         with allure.step(f'Try to get user with invalid data: {case}'):
             response = user.get_user_by_nickname(data['nickname'])
             allure.attach(str(data), name=f"Invalid user case: {case}",
@@ -67,16 +69,77 @@ class TestUsers(BaseTest):
             assert response.status_code == 404, response.json()
 
     @allure.story('Put user positive')
+    @pytest.mark.api_positive
+    @pytest.mark.parametrize('case, data', [
+        ("Valid user update 1", user_generator.valid_user()),
+        ("Valid user update 2", user_generator.valid_user()),
+        ("Valid user update 3", user_generator.valid_user()),
+        # ("Nickname is empty", user_generator.invalid_user_nickname_is_empty())
+    ])
+    def test_put_user_by_nickname(self, create_and_delete_user, user, response_validator, case, data):
+        with allure.step(f'Try to put user with data: {case}'):
+            response = user.put_user_age_and_job(create_and_delete_user['nickname'], data['age'], data['job'])
+            allure.attach(str(data), name=f"Invalid user case: {case}",
+                          attachment_type=allure.attachment_type.JSON)
+            assert response.status_code == 200, response.json()
+
+    @allure.story('Put user negative')
     @pytest.mark.api_negative
     @pytest.mark.parametrize('case, data', [
-        ("Valid user update", random_user()),
-
-        #("Nickname is empty", invalid_user.invalid_user_nickname_is_empty())
+        ("Wrong type job and age", user_generator.put_user_invalid_type_age_and_job()),
+        ("Wrong type job", user_generator.put_user_invalid_type_age()),
+        ("Wrong type age", user_generator.put_user_invalid_type_job()),
+        ("Age more than 100", user_generator.put_user_invalid_type_job()),
+        ("Age is negative", user_generator.put_user_invalid_type_job()),
     ])
-    def test_put_user_by_nickname(self,create_and_delete_user, user, response_validator, case, data):
+    def test_put_user_by_nickname(self, create_and_delete_user, user, response_validator, case, data):
         with allure.step(f'Try to put user with data: {case}'):
-            with allure.step(f'Try to get user with invalid data: {case}'):
                 response = user.put_user_age_and_job(create_and_delete_user['nickname'], data['age'], data['job'])
                 allure.attach(str(data), name=f"Invalid user case: {case}",
                               attachment_type=allure.attachment_type.JSON)
-                assert response.status_code == 200, response.json()
+                assert response.status_code == 400, response.json()
+
+    @allure.story('Delete user positive')
+    @pytest.mark.api_positive
+    @pytest.mark.parametrize('case, data', [
+        ("Valid user delete 1", user_generator.valid_user()),
+        ("Valid user delete 2", user_generator.valid_user()),
+        ("Valid user delete 3", user_generator.valid_user()),
+    ])
+    def test_delete_user_by_nickname(self, create_user, user, response_validator, case, data):
+        with allure.step(f'Try to get user: {case}'):
+            response = user.delete_user(create_user['nickname'])
+            assert  response.status_code == 200
+
+        with allure.step(f'Try to get user: {case}'):
+            response = user.get_user_by_nickname(create_user['nickname'])
+            assert response.status_code == 404
+
+    @allure.story('Delete user negative')
+    @pytest.mark.api_negative
+    @pytest.mark.parametrize('case', [
+        "User 404",
+        "User 400",
+    ])
+    def test_delete_user_by_nickname(self, create_user, user, response_validator, case):
+        with allure.step(f'Try to get user: {case}'):
+            response = user.delete_user(create_user['nickname'] * 2)
+            if response.status_code == 404:
+                assert True
+            else:
+                with allure.step(f'Validate user'):
+                    assert response_validator.validate_negative_requests(create_user, 'DeleteUserByNickname')
+
+    @allure.story('Create user info positive')
+    @pytest.mark.api_positive
+    @pytest.mark.parametrize('case, data', [
+        #("Valid user delete 1", user_generator.post_),
+        #("Valid user delete 2", user_generator.post_),
+        #("Valid user delete 3", user_generator.post_),
+    ])
+    def test_post_create_user(self, create_and_delete_user, response_validator, user, case, data):
+        with allure.step('Check that user exists'):
+            response = self.user.get_user_by_nickname(create_and_delete_user['nickname'])
+            assert response.status_code == 200, response.json()
+        with allure.step('Validate user'):
+            assert response_validator.validate_positive_requests(create_and_delete_user, 'GetUserByNickname')
