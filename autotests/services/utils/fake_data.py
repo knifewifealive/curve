@@ -37,6 +37,36 @@ class FakeUser:
             "job": self.fake.pystr(min_chars=101, max_chars=120)
         }
 
+    def invalid_user_too_long_nickname(self) -> dict:
+        """Значения, превышающие max_length"""
+        return {
+            "nickname": self.fake.pystr(min_chars=21, max_chars=30),
+            "first_name": self.fake.first_name()[:20],
+            "last_name": self.fake.last_name()[:20],
+            "age": self.fake.random_int(min=1, max=99),
+            "job": self.fake.job()[:100],
+        }
+
+    def invalid_user_nickname_type(self) -> dict:
+        return {
+            "nickname": self.fake.random_int(min=1, max=99),
+            "first_name": self.fake.first_name()[:20],
+            "last_name": self.fake.last_name()[:20],
+            "age": self.fake.random_int(min=1, max=99),
+            "job": self.fake.job()[:100],
+        }
+
+    def invalid_user_nickname_is_empty(self) -> dict:
+        return {
+            "nickname": "",
+            "first_name": self.fake.first_name()[:20],
+            "last_name": self.fake.last_name()[:20],
+            "age": self.fake.random_int(min=1, max=99),
+            "job": self.fake.job()[:100],
+        }
+
+
+
     def invalid_user_wrong_age(self) -> dict:
         """Возраст вне диапазона (ge=1, le=99)"""
         return {
@@ -55,6 +85,12 @@ class FakeUser:
             "last_name": None,         # должно быть str
             "age": "twenty",           # должно быть int
             "job": 98765               # должно быть str
+        }
+
+    def put_user_valid(self) -> dict:
+        return {
+            "age": self.fake.random_int(min=1, max=99),
+            "job": self.fake.job()[:100],
         }
 
     def random_invalid_user(self) -> dict:

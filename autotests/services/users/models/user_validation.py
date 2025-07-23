@@ -17,6 +17,8 @@ class ResponseValidator:
             'PostCreateUser': lambda response_json: HTTPValidationError(**response_json),
         }
 
+    def validate_user(self, create_and_delete_user):
+        return UserGetSchema(**create_and_delete_user)
 
     def validate_positive_requests(self, response_json, request_type):
 

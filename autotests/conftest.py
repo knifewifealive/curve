@@ -33,7 +33,6 @@ def create_and_delete_user(user, response_validator, random_user):
                       attachment_type=allure.attachment_type.JSON)
         assert validate_response
 
-    yield response.json()
 
     with allure.step('Check for created user: '):
         response = user.get_user_by_nickname(nickname=random_user['nickname'])
@@ -41,6 +40,7 @@ def create_and_delete_user(user, response_validator, random_user):
                       attachment_type=allure.attachment_type.JSON)
         assert response.status_code == 200, response_validator.validate_positive_requests(response.json(),
                                                                                           'GetUserByNickname')
+    yield response.json()
     with allure.step('Delete user after creation: '):
         response = user.delete_user(nickname=random_user['nickname'])
         allure.attach(str(response.json()), name="Delete user after creation: ",
