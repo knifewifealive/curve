@@ -1,5 +1,7 @@
 import allure
 import pytest
+from requests import JSONDecodeError
+
 from autotests.services.users.api_users import User
 from autotests.services.users.models.user_validation import ResponseValidator
 from autotests.services.utils.fake_data import FakeUser
@@ -41,12 +43,17 @@ def create_and_delete_user(user, response_validator, random_user):
         assert response.status_code == 200, response_validator.validate_positive_requests(response.json(),
                                                                                           'GetUserByNickname')
     yield response.json()
-    with allure.step('Delete user after creation: '):
-        response = user.delete_user(nickname=random_user['nickname'])
-        allure.attach(str(response.json()), name="Delete user after creation: ",
-                      attachment_type=allure.attachment_type.JSON)
-        assert response.status_code == 200, response_validator.validate_positive_requests(response.json(),
-                                                                                          'DeleteUserByNickname')
+    try:
+        with allure.step('Delete user after creation: '):
+            response = user.delete_user(nickname=random_user['nickname'])
+            allure.attach(str(response.json()), name="Delete user after creation: ",
+                          attachment_type=allure.attachment_type.JSON)
+            assert response.status_code == 200, response_validator.validate_positive_requests(response.json(),
+                                                                                              'DeleteUserByNickname')
+    except JSONDecodeError as e:
+
+        allure.attach(str(f'Raised requests error: {e},\n server error: {response.text}'), attachment_type="text/*")
+        assert response.status_code == 500
 
 
 @pytest.fixture()

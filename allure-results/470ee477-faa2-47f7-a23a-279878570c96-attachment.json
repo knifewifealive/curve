@@ -1,1 +1,0 @@
-{'detail': [{'loc': ['body', 'nickname'], 'msg': 'String should have at most 20 characters'}, {'loc': ['body', 'first_name'], 'msg': 'String should have at most 20 characters'}, {'loc': ['body', 'last_name'], 'msg': 'String should have at most 20 characters'}, {'loc': ['body', 'job'], 'msg': 'String should have at most 100 characters'}]}

@@ -113,4 +113,27 @@ class FakeUser:
     # User_Info
 
 
+    def post_user_info(self) -> dict:
+        return {
+            "information": self.fake.text(max_nb_chars=30),
+            "explanation": self.fake.text(max_nb_chars=100)
+        }
 
+    def post_user_info_invalid_type(self) -> dict:
+        return {
+            "information": self.fake.random_int(min=1, max=100),
+            "explanation": self.fake.random_int(min=1,max=100)
+        }
+
+    def post_user_info_more_characters(self) -> dict:
+        return {
+            "information": self.fake.pystr(min_chars=31, max_chars=200),
+            "explanation": self.fake.pystr(min_chars=101, max_chars=200)
+        }
+
+    @staticmethod
+    def post_user_info_empty_strings() -> dict:
+        return {
+            "information": "",
+            "explanation": ""
+        }

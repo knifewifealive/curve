@@ -16,6 +16,7 @@ class ResponseValidator:
         self.APIRequestsFailure = {
             'PostCreateUser': lambda response_json: HTTPValidationError(**response_json),
             'DeleteUserByNickname': lambda response_json: HTTPValidationError(**response_json),
+            'PostCreateUserInfo': lambda response_json: HTTPValidationError(**response_json)
         }
 
     def validate_user(self, create_and_delete_user):
