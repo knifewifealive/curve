@@ -207,14 +207,14 @@ class TestUsers(BaseTest):
                           attachment_type=allure.attachment_type.JSON)
             assert response.status_code == 200, response.json()
             information_id = response.json()[0]['id']
-
+        # Тест падает
         # with allure.step('Delete user info: '):
         #     response = user.delete_user_info(create_and_delete_user['nickname'], information_id)
         #     print(f'Delete user info: {response.json()}\n')
-        #     assert response.status_code == 404, response.json()
+        #     assert response.status_code == 200, response.json()
         #
         # with allure.step('Try to get user info: '):
         #     response = user.get_user_info(create_and_delete_user['nickname'])
         #     allure.attach(str(response.json()), name="Get user info",
         #                   attachment_type=allure.attachment_type.JSON)
-        #     assert response.status_code == 200, response.json()
+        #     assert response.status_code == 404, response.json()
