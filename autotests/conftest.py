@@ -1,7 +1,6 @@
 import allure
 import pytest
 from requests import JSONDecodeError
-
 from autotests.services.users.api_users import User
 from autotests.services.users.models.user_validation import ResponseValidator
 from autotests.services.utils.fake_data import FakeUser

@@ -1,13 +1,41 @@
-# Forgetting-Curve
+# Curve
 
-## Description
-The forgetting curve hypothesizes the decline of memory retention in time
+## О проекте
+Curve — это веб-приложение на Python/FastAPI для работы с пользователями и базой данных. В рамках QA реализованы автотесты, покрывающие ключевые пользовательские сценарии и бизнес-логику.
 
+## Технологии
+- **FastAPI** — backend-фреймворк
+- **pytest** — автотесты
+- **Allure** — отчёты по тестированию
+- **SQLite** — база данных
+- **Docker** — контейнеризация (опционально)
 
-## How to install and run
-1. In the CLI write this command:
-> docker build -t fastapi-app .
-2. The next step is to write in CLI this command:
-> docker run --name fastapi-container -p 8000:8000 fastapi-app
-3. ### You're awesome!
->>>>>>> a27e7cc (init: add endpoints, payloads, api methods)
+## Быстрый старт
+1. Установка зависимостей:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Запуск приложения:
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+## Тестирование
+- Запуск автотестов:
+  ```bash
+  pytest --alluredir=allure-results  .\autotests\ -s
+  ```
+- Генерация отчёта Allure:
+  ```bash
+  allure serve allure-results
+  ```
+
+## Выполненные работы по QA
+- Разработка и реализация автотестов для основных сценариев
+- Настройка генерации отчётов Allure
+- Тестирование API
+- Валидация данных при помощи pydantic
+- Позитивные и негативные тесты при помощи конструктора пользователей при помощи faker
+- Проверка интеграции с базой данных
+
+---

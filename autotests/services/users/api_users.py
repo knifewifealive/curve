@@ -70,9 +70,9 @@ class User:
         return response
 
     @allure.step('Delete request to delete user info')
-    def delete_user_info(self, nickname: str, indormation_id: int) -> Response:
+    def delete_user_info(self, nickname: str, information_id: int) -> Response:
         response = requests.delete(
-            url=self.endpoint.delete_user_info(nickname, indormation_id)
+            url=self.endpoint.delete_user_info(nickname, information_id)
         )
         return response
 

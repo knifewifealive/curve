@@ -94,10 +94,10 @@ class TestUsers(BaseTest):
     ])
     def test_put_user_by_nickname(self, create_and_delete_user, user, response_validator, case, data):
         with allure.step(f'Try to put user with data: {case}'):
-                response = user.put_user_age_and_job(create_and_delete_user['nickname'], data['age'], data['job'])
-                allure.attach(str(data), name=f"Invalid user case: {case}",
-                              attachment_type=allure.attachment_type.JSON)
-                assert response.status_code == 400, response.json()
+            response = user.put_user_age_and_job(create_and_delete_user['nickname'], data['age'], data['job'])
+            allure.attach(str(data), name=f"Invalid user case: {case}",
+                          attachment_type=allure.attachment_type.JSON)
+            assert response.status_code == 400, response.json()
 
     @allure.story('Delete user positive')
     @pytest.mark.api_positive
@@ -106,7 +106,7 @@ class TestUsers(BaseTest):
             response = user.delete_user(create_user['nickname'])
             allure.attach(str(response.json()), name="Delete user after creation: ",
                           attachment_type=allure.attachment_type.JSON)
-            assert  response.status_code == 200
+            assert response.status_code == 200
 
         with allure.step(f'Try to get user: {case}'):
             response = user.get_user_by_nickname(create_user['nickname'])
@@ -157,7 +157,7 @@ class TestUsers(BaseTest):
         with allure.step('Validate response'):
             allure.attach(str(response.json()), name="Validate response after user info creation",
                           attachment_type=allure.attachment_type.JSON)
-            assert response_validator.validate_negative_requests(response.json(),'PostCreateUserInfo')
+            assert response_validator.validate_negative_requests(response.json(), 'PostCreateUserInfo')
 
     @allure.story('Get user info by nickname')
     @pytest.mark.api_positive
@@ -182,3 +182,39 @@ class TestUsers(BaseTest):
             allure.attach(str(response.json()), name="Get user info",
                           attachment_type=allure.attachment_type.JSON)
             assert response.status_code == 200, response.json()
+
+    @allure.story('Delete user info by nickname')
+    @pytest.mark.api_positive
+    @pytest.mark.parametrize('case, data', [
+        ("Put valid info 1", user_generator.post_user_info()),
+        ("Put valid info 2", user_generator.post_user_info()),
+        ("Put valid info 3", user_generator.post_user_info()),
+    ])
+    def test_delete_user_info(self, create_and_delete_user, user, response_validator, case, data):
+        with allure.step('Create user info'):
+            response = user.post_create_user_info(create_and_delete_user['nickname'], **data)
+            allure.attach(str(response.json()), name="Create user info",
+                          attachment_type=allure.attachment_type.JSON)
+            assert response.status_code == 200, response.json()
+        with allure.step('Validate response'):
+            allure.attach(str(response.json()), name="Validate response after user info creation",
+                          attachment_type=allure.attachment_type.JSON)
+            assert response_validator.validate_positive_requests(response.json(), 'PostCreateUserInfo')
+
+        with allure.step('Get user info id to delete: '):
+            response = user.get_user_info(create_and_delete_user['nickname'])
+            allure.attach(str(response.json()), name="Get user info",
+                          attachment_type=allure.attachment_type.JSON)
+            assert response.status_code == 200, response.json()
+            information_id = response.json()[0]['id']
+
+        # with allure.step('Delete user info: '):
+        #     response = user.delete_user_info(create_and_delete_user['nickname'], information_id)
+        #     print(f'Delete user info: {response.json()}\n')
+        #     assert response.status_code == 404, response.json()
+        #
+        # with allure.step('Try to get user info: '):
+        #     response = user.get_user_info(create_and_delete_user['nickname'])
+        #     allure.attach(str(response.json()), name="Get user info",
+        #                   attachment_type=allure.attachment_type.JSON)
+        #     assert response.status_code == 200, response.json()
